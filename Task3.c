@@ -15,8 +15,6 @@ UART_HandleTypeDef uart_init1;
 SPI_HandleTypeDef spi_init;
 
 void GPIO_set_SPI();
-//void read_input();
-//void GPIO_set_UART();
 
 int main(){
 	Sys_Init();
@@ -25,27 +23,29 @@ int main(){
 	GPIO_set_SPI();
 
 	while(1){
-		user_s[0] = getchar();
+		user_s[0] = getchar();//Read user input
+		
+		//Print data from terminal
 		printf("\033[2J\033[;H");
 		fflush(stdout);
 		printf("From computer:\r\n%c",user_s[0]);
 		fflush(stdout);
 		printf("\033[13;H");
 		fflush(stdout);
+		//Print data from SPI bus
 		printf("From SPI:\r\n");
 		HAL_SPI_TransmitReceive(&spi_init, (uint8_t *)user_s,(uint8_t *)user_m,1, 100);
 		printf("%c\r\n",user_m[0]);
-		//HAL_SPI_TransmitReceive(&spi_init, (uint8_t *)user_m,(uint8_t *)user_m,1, 10);
+		
 		user_m[0] =0;
 		user_s[0] =0;
-		//}
 	}
 }
 
 
 void GPIO_set_SPI(){
 	__SPI2_CLK_ENABLE();
-
+       //Configure SPI bus
 	spi_init.Instance = SPI2;
 	spi_init.Init.Mode = SPI_MODE_MASTER;
 	spi_init.Init.Direction = SPI_DIRECTION_2LINES;
@@ -58,7 +58,8 @@ void GPIO_set_SPI(){
 	spi_init.Init.TIMode = SPI_TIMODE_DISABLE;
 	spi_init.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
 	HAL_SPI_Init(&spi_init);
-
+ 
+        //Configure GPIO pins
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	GPIO_InitTypeDef gpio_init;
@@ -72,7 +73,3 @@ void GPIO_set_SPI(){
     gpio_init.Pin = GPIO_PIN_11 | GPIO_PIN_12;
     HAL_GPIO_Init(GPIOA, &gpio_init);
 }
-
-//void read_input(){
-//
-//}
